@@ -1,0 +1,59 @@
+install.packages("ggplot2")
+install.packages("dplyr")
+
+library(ggplot2)
+library(dplyr)
+
+# Example GWAS data
+# df must contain: SNP, CHR, BP, P
+
+# Example highlight SNPs
+highlight_snps <- c(snpsofinterest)
+
+# Prepare data
+df <- data %>%
+  arrange(CHR, POS) %>%
+  mutate(
+    logP = FST,
+    highlight = ifelse(SNP %in% highlight_snps, "yes", "no")
+  )
+
+# Create cumulative position for chromosomes
+df <- df %>%
+  group_by(CHR) %>%
+  mutate(chr_len = max(POS)) %>%
+  ungroup() %>%
+  mutate(tot = cumsum(as.numeric(chr_len)) - chr_len) %>%
+  arrange(CHR, POS) %>%
+  mutate(BP_cum = POS + tot)
+
+# Axis labels (chromosome centers)
+axis_df <- df %>%
+  group_by(CHR) %>%
+  summarise(center = mean(BP_cum))
+
+# Plot
+ggplot(df, aes(x = BP_cum, y = logP)) +
+  geom_point(aes(color = as.factor(CHR)), size = 1, alpha = 0.7) +
+  geom_hline(yintercept = 0.0848, color = "blue", linetype = "dashed") +
+  # Highlight SNPs in red
+  geom_point(
+    data = subset(df, highlight == "yes"),
+    color = "firebrick",
+    size = 2
+  ) +
+  
+  scale_color_manual(values = rep(c("grey30", "grey60"), 22)) +
+  
+  scale_x_continuous(guide = guide_axis(check.overlap = TRUE), expand = expansion(add = c(0, 10)),
+                     label = axis_df$CHR,
+                     breaks = axis_df$center
+  ) +
+  
+  labs(x = "Chromosome", y = "Fst") +
+  
+  theme_bw(base_size = 15) +
+  theme(axis.text.x = element_text(angle =45, hjust = 1),
+        legend.position = "none",
+        panel.border = element_blank(),
+        panel.grid = element_blank())
