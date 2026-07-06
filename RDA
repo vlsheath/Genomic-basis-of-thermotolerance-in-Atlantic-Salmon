@@ -1,0 +1,89 @@
+library(tidyverse)
+library(data.table)
+library(vegan)
+
+slice_min() 
+BottomminFull<-genomicDataFAM %>% slice_min(V6, n = 10)
+slice_max()  
+TopmaxFull<-genomicDataFAM %>% slice_max(V6, n=10)
+BottomminFull<-genomicDataFAM %>% group_by(V2) %>% slice_min(V6, n=10, with_ties = FALSE)
+TopmaxFull<-genomicDataFAM %>% group_by(V2) %>% slice_max(V6, n=10, with_ties = FALSE)
+
+genomicDataCMP <- fread("testmafWAB.raw", header = T)
+#genomicDataFull <- fread("Salmon.salar.CTmax_5000SNP_practicedatasetraw.raw", header = T)
+RDA_weightCOVCMP<-merge(genomicDataCMP, CTmaxID_Weight, by.x = "FID", by.y = "TAG ID")
+
+rawsubsetCMP<-subset(RDA_weightCOVCMP, select=-c(FID:PHENOTYPE, Weight))
+rawsubsetIDCMP<-subset(RDA_weightCOVCMP, select=c(FID:PHENOTYPE))
+rawsubsetWeightCMP<-subset(RDA_weightCOVCMP, select=c(Weight))
+
+#genomicDataFAM <- fread("Salmo.salar.CTmax.Fullraw.fam", header = F) %>%  
+  #mutate(IID = V2, FID = V1, PAT = V3, MAT = V4, SEX = V5, PHENOTYPE = V6) %>% 
+  #select (-FID, -IID, -PAT, -MAT, -SEX, -PHENOTYPE)
+
+#rawdatasetimputated<- data.frame(apply(rawsubset, 2, function(x) replace(x, is.na(x), as.numeric(names(which.max(table(x)))))))
+
+rawsubsetID$V6<-as.numeric(rawsubsetID$V6)
+
+rdaGenomeCMP <- rda(rawsubsetCMP~rawsubsetIDCMP$PHENOTYPE+Condition(rawsubsetWeightCMP$Weight), scale=T)
+RsquareAdj(rdaGenomeCMP)
+
+
+#put 1 or condition(weight) and population factor for conditioning variable
+#are PCA values associated with CTmax - correlation do that ((already done, with GEMMA - use that))
+chrom_mapFull <- fread("testmafGAR.bim") %>%
+  mutate(CHROM = V1, SNP = V2, BP = V4) %>% 
+  select(CHROM, SNP, BP)
+
+plot(rdaGenomeGAR)
+#biplot(rdaGenomeGAR, scaling=1)
+
+#Function to map RDA scores
+#Knum is number of RDA axes to use (usually 3)
+RDA_scores_map<- function(RDAobj, mapobj, Knum) {
+  RDAscores <- data.frame(abs(RDAobj$CCA$v[,1:Knum])) #get absolute values of RDA scores for easy plotting
+  colnames(RDAscores) <- paste0("absRDA", rep(1:Knum))
+  RDAobj_map <- bind_cols(mapobj, RDAscores)
+  return(RDAobj_map)}
+
+
+#Call the function on our rda object and chrom map
+rdaLoadingsMap <- RDA_scores_map(rdaGenomeCMP, chrom_mapFull, 1)
+(head(rdaLoadingsMap))
+
+#biplot
+sitesCMP <- scores(rdaGenomeGAR, display = "sites", scaling = 3)
+sites_df <- as.data.frame(sitesCMP)
+biplot_scores <- scores(rdaGenomeGAR, display = "bp", scaling = 3)
+biplot_df <- as.data.frame(biplot_scores)
+
+ggplot(sites_df) +
+  geom_point(mapping = aes(x=RDA1, y=PC1))+geom_segment(data = biplot_df,
+             aes(x = 0, y = 0, xend = RDA1, yend = PC1),
+             arrow = arrow(length = unit(0.3, "cm")), color = "dodgerblue3", linewidth = 1) +
+  geom_text(data = biplot_df,
+            aes(x = RDA1, y = PC1, label = "CTmax"),
+            color = "darkgreen", size = 4, hjust = -0.2, vjust = 0.2)
+#library(qqman)
+#rda.climate.plot1 <- qqman(gwas = rdaLoadingsMap,snp = "SNP", bp = "BP", chrom = "CHROM", pvalue = "absRDA1", logTransform = F, pointSize = 1, ylabel = "absRDA1", ymax = .025) + theme_classic()
+#rda.climate.plot1
+#library(qqman)
+
+#rdaLoadingsMapwithout <- rdaLoadingsMap[!rdaLoadingsMap$SNP=="1_160686009",]
+
+library(qqman)
+
+# Make the Manhattan plot on the gwasResults dataset
+#manhattan(rdaLoadingsMapwithout, chr="CHROM", bp="BP", snp="SNP", p="absRDA1" )
+#manhattan(rdaLoadingsMap, snp = "SNP", bp = "BP", chr = "CHROM", p= "absRDA1", logp = FALSE, ymax=0.1) 
+manhattan(rdaLoadingsMap, snp = "SNP", bp = "BP", chr = "CHROM", p= "absRDA1", logp = FALSE, ylab="", suggestiveline = 0.00148, ylim=c(0,0.003))
+
+mtext("absRDA1", side = 2, line = 4)
+         
+
+cutoff<-quantile(rdaLoadingsMap$absRDA1, 0.99, na.rm=T)
+topRDA_CMP<-subset(rdaLoadingsMap, absRDA1>cutoff)
+#top<-rdaLoadingsMap$absRDA1 %>% top_n(-10)
+topWAB<-top_n(rdaLoadingsMap, 150000, absRDA1)
+#rdaLoadingsMapwithout = rdaLoadingsMap[!rdaLoadingsMap$absRDA1<=0,]
+write.table(topRDA_CMP, "TopCMP_withmaf_withweightcov_RDA.txt", sep="\t")
