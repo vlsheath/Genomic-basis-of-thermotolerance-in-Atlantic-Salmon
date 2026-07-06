@@ -1,0 +1,28 @@
+install.packages("lme4")
+#install.packages("lmerTest")
+library(lme4)
+#library(lmerTest)
+CTmaxR$Type<-as.factor(CTmaxR$Type)
+CTmaxR$TrialID<-as.factor(CTmaxR$TrialID)
+model2 <- lmer(Temp ~ Weight*Type*(1 | TrialID), data = CTmaxR)
+model3 <- lmer(Temp ~ Type*Weight+(1 | TrialID), data = CTmaxR)
+model4 <- lm(Temp ~ Type+Weight, data = CTmaxR)
+anova(model3)
+Anova(model3)
+summary(anova(model3))
+summary(model3)
+lmerTest::anova(model2, type=2)
+anova(model3, type = 2)
+
+install.packages("car")
+library(car)
+Anova(model3, type = "II")
+p<-aov(model4)
+TukeyHSD(p)
+install.packages("agricolae")
+library(agricolae)
+compare <- HSD.test(model4, "Type", group=TRUE)
+compare
+
+manhattan(data, chr = "CHR", snp="SNP", bp= "POS", p="NMISS", logp = F, highlight = snpsofinterest, suggestiveline = 0.0848, ylab="Fst", ylim=c(0,0.4))
+
