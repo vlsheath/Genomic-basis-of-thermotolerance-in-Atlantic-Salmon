@@ -1,0 +1,22 @@
+library(tidyverse)
+library(data.table)
+library(vegan)
+library(tidyverse)
+#in plink: plink --bfile Salmo.salar.CTmax.Fullraw --chr-set 29 --snps 1_162490180 --recode --out FSTSNP_chrom1
+#ped file open, copy, paste in excel, seperate by space, add column names, bring to R
+
+#use excel to combine alleles into genotypes then import
+
+library(readxl)
+FST_Chr3_snp <- read_excel("~/PHD/FST_Chr3_snp.xlsx")
+View(FST_Chr3_snp)
+
+
+boxplot(PHENO~GENO, data=FST_Chr3_snp)
+
+lm1<-lm(PHENO~GENO, data = FST_Chr3_snp)
+summary(lm1)
+
+ggplot(FST_Boxplot_ALL, aes(x=GENO, y=PHENO))+ geom_boxplot()+ theme( legend.position = "none" )+ facet_wrap(.~CHR) 
+
+ggplot(R_FSTsnps_boxplots_ALL, aes(x=Genotype, y=Phenotype))+ geom_boxplot()+ theme( legend.position = "none" )+ facet_wrap(.~SNP_ID)+theme_bw() 
