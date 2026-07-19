@@ -1,0 +1,39 @@
+
+install.packages("ranger")
+library(ranger)
+library(tidyverse)
+library(data.table)
+genomicData <- fread("RandomforestSubset.raw", header = T)
+`1500SNPs_RF_Step1` <- read.csv("C:/Users/booka/Downloads/untitled_folder/1500SNPs_RF_Step1.raw", sep="")
+genomicData<- RandomForest100Random
+#genomicData_1500 <- fread("1500_important_step1.raw", header = T)
+genomicData<-subset(genomicData, select=-c(PAT:SEX))
+genomicData<-subset(genomicData, select=-c(FID:IID))
+#subset training data
+
+train.idx <- sample(nrow(genomicData), 2/3 * nrow(genomicData))
+iris.train <- genomicData[train.idx, ] 
+iris.test <- genomicData[-train.idx, ]
+
+# Add prefix using paste() and colnames()
+colnames(genomicData) <- paste("a", colnames(genomicData), sep = "")
+#colnames(iris.test) <- paste("a", colnames(iris.test), sep = "")
+
+#print(iris.train)
+#run random forest with training data
+set.seed(62)
+#rg.iris <- ranger(aPHENOTYPE ~ ., data = genomicData, mtry =40, num.trees =1500, importance = "impurity")
+rg.iris <- ranger(PHENOTYPE ~ ., data = iris.train, mtry =80, num.trees =1500, importance = "impurity")
+#use random forest model to predict the outcome of the test data
+
+pred.iris <- predict(rg.iris, data = iris.test)
+plot(x=iris.test$PHENOTYPE, y=pred.iris$predictions)
+model1<-lm(iris.test$PHENOTYPE~pred.iris$predictions)
+summary(model1)
+
+SNP_importance<-as.data.frame(rg.iris$variable.importance)
+write.table(SNP_importance, file = "seed470_50SNPimportance.txt", sep = ",", row.names = TRUE, col.names = TRUE)
+
+ggplot(data = All_setseeds_RandomForest, mapping = aes(x = Prediction, y = Actual, colour = SetSeed)) + geom_point()+geom_smooth(method="lm", se=F)+labs(x="Phenotype Prediction",y="Phenotype Actual", colour="Replicates")+theme_classic()
+
+
