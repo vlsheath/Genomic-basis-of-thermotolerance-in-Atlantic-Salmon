@@ -1,0 +1,11 @@
+In PLINK
+plink --bfile Salmo.salar.CTmax.Fullraw --allow-extra-chr --chr-set 29 --pca --out PCA
+  
+
+library(ggplot2)
+
+PCA <- read.table("~/PHD/files for code chpt 1/PCA.eigenvec", quote="\"", comment.char="")
+
+ggplot(PCA, aes(x=V3, y=V4, colour=V2)) + geom_point()+labs(x=("PC 1 (4.57%)"),y="PC 2 (2.64%)",colour="Populations")+theme_classic(base_size = 15)
+
+
