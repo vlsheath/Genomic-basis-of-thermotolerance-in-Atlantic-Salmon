@@ -2,7 +2,6 @@ library("ggplot2")
 #Tank temp before CTmax experiments
 ggplot(CTmaxbefore, aes(x=Date_Time, y=Temp, colour=Tank)) + geom_line() + xlab("Date") +theme_classic()+ylab("Temperature (°C)")+ scale_y_continuous(limits = c(14.0, 16.0))
 #Tank temp during experiments (includes a bit at the end not in paper)
-ggplot(ExpTank, aes(x=Time, y=Temp, colour=Experiment)) + geom_line() + xlab("Time of Day (24hr)") +theme_classic()+ylab("Temperature (°C)")
-
+ggplot(ExpTank_, aes(x=Time, y=Temp, colour=Experiment)) + geom_line() + xlab("Time of Day (24hr)") +theme_classic()+ ylab("Temperature (°C)")
 #CTmax plot (Not yet)
 ggplot(SummerRdataFinal, aes(x=River, y=Temp)) + geom_boxplot() + geom_jitter(aes(color = Weight), size = 2, width=0.25) + scale_color_gradient(low = "darkblue", high = "yellow", na.value = "yellow",breaks=c(3,5,10,14),labels=c(0,5,10,">15")) + labs(x = "River of Origin", y = "CTmax (°C)", colour = "Weight (g)") + scale_x_discrete(labels=c("blue" = "Campbellton", "red" = "Western Arm Brook", "yellow" = "Garnish")) + theme(text = element_text(size = 18)) + theme(panel.background = element_blank())+stat_summary()
