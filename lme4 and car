@@ -26,3 +26,28 @@ compare
 
 manhattan(data, chr = "CHR", snp="SNP", bp= "POS", p="NMISS", logp = F, highlight = snpsofinterest, suggestiveline = 0.0848, ylab="Fst", ylim=c(0,0.4))
 
+install.packages("lme4")
+library(lme4)
+CTmaxR$Type<-as.factor(CTmaxR$Type)
+CTmaxR$TrialID<-as.factor(CTmaxR$TrialID)
+model2 <- lmer(Temp ~ Weight*Type+(1 | TrialID), data = CTmaxR)
+model3 <- lmer(Temp ~ Type*Weight+(1 | TrialID), data = CTmaxR)
+model4 <- lm(Temp ~ Type+Weight, data = CTmaxR)
+model5 <- lm(Temp ~ Type*Weight, data = CTmaxR)
+model6 <- lm(Temp ~ Weight*Type, data = CTmaxR)
+anova(model3)
+anova(model2)
+
+install.packages("car")
+library(car)
+Anova(model6, type="II")
+
+model31 <- lmer(Temp ~ Weight+(1 | TrialID), data = CTmaxR)
+
+library(lmtest)
+full <- lm(formula = Temp ~ Type*Weight*TrialID, data = CTmaxR)
+reduced<- lm(formula= Temp ~ Weight*TrialID, data = CTmaxR)
+
+likelihood_ratio_test <- lrtest(reduced, full)
+likelihood_ratio_test <- lrtest(model31, model3)
+likelihood_ratio_test
