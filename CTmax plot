@@ -1,0 +1,52 @@
+
+#### PACKAGES ####
+library(ggplot2)
+library(gridExtra)
+library(ggExtra)
+library(lubridate) #manipulate dates
+library(tidyverse)
+library(grid) #textGrob for title font manipulation in grid.arrange 
+library(dplyr)
+
+
+#### Input Data Files ####
+thermos_2021 <- read.csv("Combined_Data_2020_to_Sept2022_WAB_GAR_CMP_Thermographs.csv")
+
+names(thermos_2021)
+
+str(thermos_2021)
+
+#fix date variable from chr to date
+thermos_2021$Date <- as.Date(thermos_2021$Date, format = "%m/%d/%Y")
+
+str(thermos_2021) #fixed
+
+
+thermos_2021$datetime <- paste(thermos_2021$Date, thermos_2021$Time, sep=" ")
+thermos_2021$datetime <- as.POSIXct(thermos_2021$datetime, format="%Y-%m-%d %H:%M:%S")
+
+str(thermos_2021) #fixed
+
+#IF you want to plot temps across time within days, 
+#Specify order of factor levels for time....this ensures that ggplot will plot the data by time in order rather than by first digit. 
+thermos_2021$Time <- factor(thermos_2021$Time, levels = c("0:00:00", "1:00:00", "2:00:00", "3:00:00","4:00:00", "5:00:00", 
+                                                          "6:00:00", "7:00:00", "8:00:00", "9:00:00", "10:00:00", "11:00:00",
+                                                          "12:00:00", "13:00:00", "14:00:00", "15:00:00", "16:00:00", "17:00:00",
+                                                          "18:00:00", "19:00:00", "20:00:00", "21:00:00", "22:00:00", "23:00:00"))
+
+#what rivers are in this file?
+unique(thermos_2021$River)
+
+head(thermos_2021)
+
+subthermos<-thermos_2021[which(thermos_2021$Date > "2022-06-01" & 
+                                 thermos_2021$Date < "2022-09-01" ),]
+
+
+samplepoint$date <-  as.POSIXct(samplepoint$date, format="%Y-%m-%d %H:%M:%S")
+
+ggplot()+geom_line(data=subthermos, aes(x=datetime, y=Temperature...C., col=River),alpha=0.8, 
+                   linewidth=0.5)+
+  scale_colour_manual(values=c("#F8766D", "#00BA38", "#619CFF"))+
+  theme_classic()+xlab("Date")+ylab("Temperature (˚C)")+scale_color_discrete(labels=c(Campbellton="CMP", Garnish="GAR", "Western Arm Brook"= "WAB"))+theme(axis.text = element_text(size=12),
+ 
