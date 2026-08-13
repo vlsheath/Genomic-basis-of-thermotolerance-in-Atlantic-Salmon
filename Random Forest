@@ -37,6 +37,7 @@ write.table(SNP_importance, file = "seed___SNPimportance.txt", sep = ",", row.na
 ggplot(data = All_setseeds_RandomForest, mapping = aes(x = Prediction, y = Actual, colour = SetSeed)) + geom_point()+geom_smooth(method="lm", se=F)+labs(x="Phenotype Prediction",y="Phenotype Actual", colour="Replicates")+theme_classic()
 
 library(ggplot2)
+#plot for Figure 5
 ggplot(data = Random_Forest_All_setseeds123_100SNPs, mapping = aes(x = Prediction, y = Actual, colour = SetSeed)) + geom_point()+geom_smooth(method="lm", se=F)+labs(x="Phenotype Prediction",y="Phenotype Actual", colour="Replicates")+theme_classic(base_size = 15)
-
+#plot for supplementary Figure 8
 ggplot(random_forest_averages, aes(x=SNPs, y=r_square)) + geom_point()+geom_line(color = "blue")+labs(x="Number of SNPs",y="R Square Average")+theme_classic(base_size = 17)+scale_x_continuous(breaks = seq(0, 2600, by = 200))
