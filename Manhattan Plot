@@ -4,6 +4,8 @@ install.packages("dplyr")
 library(ggplot2)
 library(dplyr)
 
+subset<-subset(Salmo.ALL.gemmaout.assoc_, select = c(chr:ps, p_wald),)
+
 # Example GWAS data
 # df must contain: SNP, CHR, BP, P
 
