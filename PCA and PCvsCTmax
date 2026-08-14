@@ -8,4 +8,9 @@ PCA <- read.table("~/PHD/files for code chpt 1/PCA.eigenvec", quote="\"", commen
 
 ggplot(PCA, aes(x=V3, y=V4, colour=V2)) + geom_point()+labs(x=("PC 1 (4.57%)"),y="PC 2 (2.64%)",colour="Populations")+theme_classic(base_size = 15)
 
+#PC1 and PC2 vs CTmax
+merged<-merge(famID, PCA_NEW, by.x = "V1", by.y = "V1")
 
+model1<-lm(V6.x~V4.y, data=merged)
+summary(model1)
+plot(x=merged$V3.y, y=merged$V6.x, xlab = "PC1", ylab = "CTmax", cex.lab=1.3, cex.axis=1.2)+abline(model1)+cex
