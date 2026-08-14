@@ -1,0 +1,4 @@
+#CTmax plot
+CTmaxRed$Weight <- ifelse(CTmaxRed$Weight <= 15, CTmaxRed$Weight, NA)
+library(ggplot2)
+ggplot(CTmaxRed, aes(x=Type, y=Temp)) + geom_boxplot(outlier.colour = "white") + geom_jitter(aes(color = Weight), size = 1.5, width=0.25) + scale_color_gradient(low = "darkblue", high = "yellow", na.value = "yellow",breaks=c(3,5,10,14),labels=c(0,5,10,">15")) + labs(x = "River of Origin", y = "CTmax (°C)", colour = "Weight (g)") + scale_x_discrete(labels=c("blue" = "Campbellton", "red" = "Western Arm Brook", "yellow" = "Garnish")) + theme(text = element_text(size = 15)) + theme(panel.background = element_blank())
