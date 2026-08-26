@@ -1,4 +1,23 @@
 plink
+  --bfile Salmo.salar.CTmax.Fullraw
+  --chr-set 29
+  --keep-fam Just_names_bottom.txt
+  --make-bed
+  --out BottomFull
+
+  --bfile Salmo.salar.CTmax.Fullraw
+  --chr-set 29
+  --keep-fam Just_names_top.txt
+  --make-bed
+  --out TopFull
+
+  --allow-no-sex
+  --chr-set 29
+  --bfile BottomFull
+  --bmerge TopFull
+  --make-bed
+  --out FSTfileReal
+
 --bfile FSTfileReal 
 --allow-no-sex
 --chr-set 29
