@@ -5,17 +5,25 @@ library(tidyverse)
 library(ggplot2)
 library(dplyr)
 
-subset<-subset(Salmo.ALL.gemmaout.assoc_, select = c(chr:ps, p_wald),)
+#For LM no covariates/no relatedness variable included
+data<-subset(Salmo.ALL.gemmaout.assoc_, select = c(chr:ps, p_wald),)
+#
 
+#For LMM covariates and relatedness variable included
+subset<-subset(GemmaOutput_NoPCA.assoc_1, select = c(chr:ps, p_wald),)
+#
+
+#For FST results
 data<- read.delim("FSTResults.fst")%>%
   drop_na()
 data$NMISS<-abs(data$FST)
+#
 
 # Example GWAS data
 # df must contain: SNP, CHR, BP, P
 
 # Example highlight SNPs
-highlight_snps <- c(snpsofinterest)
+highlight_snps <- c(important100snps$V1)
 
 # Prepare data
 df <- data %>%
