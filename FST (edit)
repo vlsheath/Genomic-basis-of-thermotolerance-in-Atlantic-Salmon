@@ -26,6 +26,3 @@ plink
 --out FSTResults
   
 
-
-# X-axis
-axis(1, at = c(0:30))
