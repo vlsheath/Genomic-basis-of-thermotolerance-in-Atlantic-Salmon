@@ -1,1 +1,5 @@
-old laptop
+#LM done with GEMMA
+gemma -bfile Salmo.salar.CTmax.Full -k Salmo.salar.CTmax.Full.KM.cXX.txt -lm -o GemmaOutput_NoPCA
+
+#LMM done with GEMMA 
+gemma -bfile Salmo.salar.CTmax.Full -k Salmo.salar.CTmax.Full.KM.cXX.txt -c Covariates_noPCA_tx.txt -lmm -o GemmaOutput_NoPCA
