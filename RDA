@@ -2,6 +2,7 @@ library(tidyverse)
 library(data.table)
 library(vegan)
 
+#This example is with Campbellton (CMP), also done with each river indvidually
 genomicDataCMP <- fread("testmafCMP.raw", header = T)
 
 rawsubsetCMP<-subset(genomicDataCMP, select=-c(FID:PHENOTYPE))
