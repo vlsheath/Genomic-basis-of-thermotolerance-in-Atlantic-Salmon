@@ -34,8 +34,6 @@ summary(model1)
 SNP_importance<-as.data.frame(rg.iris$variable.importance)
 write.table(SNP_importance, file = "seed___SNPimportance.txt", sep = ",", row.names = TRUE, col.names = TRUE)
 
-ggplot(data = All_setseeds_RandomForest, mapping = aes(x = Prediction, y = Actual, colour = SetSeed)) + geom_point()+geom_smooth(method="lm", se=F)+labs(x="Phenotype Prediction",y="Phenotype Actual", colour="Replicates")+theme_classic()
-
 library(ggplot2)
 #plot for Figure 5
 ggplot(data = Random_Forest_All_setseeds123_100SNPs, mapping = aes(x = Prediction, y = Actual, colour = SetSeed)) + geom_point()+geom_smooth(method="lm", se=F)+labs(x="Phenotype Prediction",y="Phenotype Actual", colour="Replicates")+theme_classic(base_size = 15)
